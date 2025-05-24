@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SavePal – Setup Firebase & Project Structure
 
-## Getting Started
+## 🎯 Objective
+- Integrate Firebase with Next.js
+- Create a clean project structure for app development
 
-First, run the development server:
+---
 
+## 🔧 Steps Completed
+
+### 1️. Create the Next.js project
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+npx create-next-app savepal
+cd savepal
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+**### 2. Install Firebase SDK**
+npm install firebase
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+**### 3. Create the Firsebase configurartion file**
+Create a new folder: src/firebase/
+Create the file: firebase.js with the following content:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
 
-## Learn More
+const firebaseConfig = {
+  apiKey: "AIzaSyAtsgyCbjESUzTlRY-o7ywVMEpC5bwafg",
+  authDomain: "savepal-30f07.firebaseapp.com",
+  projectId: "savepal-30f07",
+  storageBucket: "savepal-30f07.appspot.com",
+  messagingSenderId: "782974981413",
+  appId: "1:782974981413:web:0ac03b514b1f3a76c2b6cc"
+};
 
-To learn more about Next.js, take a look at the following resources:
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+export { db };
+**### 4. test Firebase connection**
+In src/app/page.js:
+"use client";
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+import { db } from "../firebase/firebase";
+import { collection, getDocs } from "firebase/firestore";
+import { useEffect } from "react";
 
-## Deploy on Vercel
+export default function Home() {
+  useEffect(() => {
+    const test = async () => {
+      const querySnapshot = await getDocs(collection(db, "expenses"));
+      querySnapshot.forEach((doc) => {
+        console.log(doc.id, " => ", doc.data());
+      });
+    };
+    test();
+  }, []);
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+  return (
+    <main className="p-4">
+      <h1 className="text-2xl font-bold text-green-600">SavePal</h1>
+      <p>Firebase connected successfully!</p>
+    </main>
+  );
+}
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 5. Git workflow
+git add .
+git commit -m "Completed task 1: Setup Firebase & project structure"
+git push -u origin master
+
