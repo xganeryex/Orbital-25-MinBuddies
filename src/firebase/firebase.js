@@ -2,7 +2,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 
-// Thay thế firebaseConfig này bằng thông tin của bạn
 const firebaseConfig = {
   apiKey: "AIzaSyAtsgyCbjESUzTlRY-o7ywVMEpC5bwafg",
   authDomain: "savepal-30f07.firebaseapp.com",
