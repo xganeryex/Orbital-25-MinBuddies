@@ -3,6 +3,7 @@
 import { db } from "../firebase/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import { useEffect } from "react";
+import Link from "next/link";
 
 export default function Home() {
   useEffect(() => {
@@ -16,9 +17,21 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="p-4">
-      <h1 className="text-2xl font-bold text-green-600">SavePal</h1>
+    <main className="p-4 text-center">
+      <h1 className="text-2xl font-bold text-green-600 mb-4">SavePal</h1>
       <p>Firebase đã kết nối thành công!</p>
+
+      <div className="mt-8 space-y-4">
+        <Link href="/income" className="block bg-blue-500 text-white px-4 py-2 rounded">
+          Go to Income Form
+        </Link>
+        <Link href="/expense" className="block bg-green-500 text-white px-4 py-2 rounded">
+          Go to Expense Form
+        </Link>
+        <Link href="/dashboard" className="block bg-purple-500 text-white px-4 py-2 rounded">
+          Go to Dashboard
+        </Link>
+      </div>
     </main>
   );
 }
