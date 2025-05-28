@@ -65,3 +65,12 @@ export default function ExpenseForm() {
     </main>
   );
 }
+import { db } from "../firebase/firebase";
+import { collection, addDoc, getDocs } from "firebase/firestore";
+const addExpense = async () => {
+  await addDoc(collection(db, "expenses"), {
+    amount: expenseAmount,
+    category: expenseCategory,
+    date: new Date()
+  });
+};
