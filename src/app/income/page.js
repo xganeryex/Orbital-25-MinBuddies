@@ -18,7 +18,7 @@ export default function IncomeForm() {
     }
 
     try {
-      await addDoc(collection(db, "income"), {
+      await addDoc(collection(db, "incomes"), {
         amount: parseFloat(amount),
         source,
         note,
