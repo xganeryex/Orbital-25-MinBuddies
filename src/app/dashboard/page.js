@@ -16,7 +16,7 @@ export default function Dashboard() {
       let expenseSum = 0;
 
       // Fetch income
-      const incomeSnap = await getDocs(collection(db, "income"));
+      const incomeSnap = await getDocs(collection(db, "incomes"));
       const incomeList = [];
       incomeSnap.forEach((doc) => {
         const data = doc.data();
@@ -38,7 +38,7 @@ export default function Dashboard() {
 
       // Recent income (latest 5 by createdAt)
       const incomeQuery = query(
-        collection(db, "income"),
+        collection(db, "incomes"),
         orderBy("createdAt", "desc"),
         limit(5)
       );
