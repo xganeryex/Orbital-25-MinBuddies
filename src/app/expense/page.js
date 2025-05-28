@@ -65,10 +65,3 @@ export default function ExpenseForm() {
     </main>
   );
 }
-const addExpense = async () => {
-  await addDoc(collection(db, "expenses"), {
-    amount: expenseAmount,
-    category: expenseCategory,
-    date: new Date()
-  });
-};
