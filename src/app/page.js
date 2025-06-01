@@ -19,7 +19,6 @@ export default function Home() {
   return (
     <main className="p-4 text-center">
       <h1 className="text-2xl font-bold text-green-600 mb-4">SavePal</h1>
-      <p>Firebase đã kết nối thành công!</p>
 
       <div className="mt-8 space-y-4">
         <Link href="/income" className="block bg-blue-500 text-white px-4 py-2 rounded">
