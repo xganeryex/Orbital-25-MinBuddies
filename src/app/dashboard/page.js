@@ -413,31 +413,31 @@ const handleSaveExpenseEdit = async () => {
         </div>
       </section>
 
-      <div className="mt-6 text-center">
-      <section>
-  <h2 className="text-lg font-bold mt-6 mb-2">Income by Source</h2>
-  <ul className="space-y-1">
-    {Object.entries(incomeSourceTotals).map(([source, total]) => (
-      <li key={source} className="text-gray-800">
-        • {source}: ${total.toFixed(2)}
-      </li>
-    ))}
-  </ul>
-</section>
+      <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+  <section>
+    <h2 className="text-lg font-bold mb-2">Income by Source</h2>
+    <ul className="space-y-1">
+      {Object.entries(incomeSourceTotals).map(([source, total]) => (
+        <li key={source} className="text-gray-800">
+          • {source}: ${total.toFixed(2)}
+        </li>
+      ))}
+    </ul>
+  </section>
 
+  <section>
+    <h2 className="text-lg font-bold mb-2">Expenses by Category</h2>
+    <ul className="space-y-1">
+      {Object.entries(expenseCategoryTotals).map(([category, total]) => (
+        <li key={category} className="text-gray-800">
+          • {category}: ${total.toFixed(2)}
+        </li>
+      ))}
+    </ul>
+  </section>
+</div>
 
-
-      <section>
-  <h2 className="text-lg font-bold mt-6 mb-2">Expenses by Category</h2>
-  <ul className="space-y-1">
-    {Object.entries(expenseCategoryTotals).map(([category, total]) => (
-      <li key={category} className="text-gray-800">
-        • {category}: ${total.toFixed(2)}
-      </li>
-    ))}
-  </ul>
-</section>
-
+<div className="mt-6 text-center">
   <Link
     href="/"
     className="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
@@ -445,6 +445,7 @@ const handleSaveExpenseEdit = async () => {
     ← Back to Home
   </Link>
 </div>
+
 
     </main>
   );
