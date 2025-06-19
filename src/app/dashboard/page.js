@@ -6,6 +6,8 @@ import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import Link from "next/link";
 import { deleteDoc, doc } from "firebase/firestore";
 import { updateDoc } from "firebase/firestore";
+import ExpensePieChart from "../../components/ExpensePieChart";
+import IncomePieChart from "../../components/IncomePieChart";
 
 
 
@@ -436,6 +438,19 @@ const handleSaveExpenseEdit = async () => {
     </ul>
   </section>
 </div>
+
+<div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+  <section>
+    <h2 className="text-lg font-bold mb-2">Income Breakdown (Pie Chart)</h2>
+    <IncomePieChart data={incomeSourceTotals} />
+  </section>
+  <section>
+    <h2 className="text-lg font-bold mb-2">Expense Breakdown (Pie Chart)</h2>
+    <ExpensePieChart data={expenseCategoryTotals} />
+  </section>
+</div>
+
+
 
 <div className="mt-6 text-center">
   <Link
