@@ -2,6 +2,8 @@
 import { useState } from "react";
 import { db } from "../../firebase/firebase";
 import { collection, addDoc } from "firebase/firestore";
+import Link from "next/link";
+
 
 
 export default function ExpenseForm() {
@@ -28,6 +30,7 @@ export default function ExpenseForm() {
     alert("Something went wrong.");
   }
 };
+
 
 
   return (
@@ -62,6 +65,16 @@ export default function ExpenseForm() {
           Add Expense
         </button>
       </form>
+
+      <div className="mt-6 text-center">
+  <Link
+    href="/"
+    className="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
+  >
+    ← Back to Home
+  </Link>
+</div>
+
     </main>
   );
 }
