@@ -12,6 +12,7 @@ import IncomeExpenseBarChart from "../../components/IncomeExpenseBarChart";
 
 
 
+
 export default function Dashboard() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
