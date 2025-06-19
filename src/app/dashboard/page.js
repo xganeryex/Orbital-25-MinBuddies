@@ -4,12 +4,22 @@ import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebase";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import Link from "next/link";
+import { deleteDoc, doc } from "firebase/firestore";
+import { updateDoc } from "firebase/firestore"; // make sure this is imported
+
+
 
 export default function Dashboard() {
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [recentIncome, setRecentIncome] = useState([]);
   const [recentExpenses, setRecentExpenses] = useState([]);
+
+  const [editingIncomeId, setEditingIncomeId] = useState(null);
+  const [editedIncome, setEditedIncome] = useState({ amount: "", source: "" });
+  const [editingExpenseId, setEditingExpenseId] = useState(null);
+  const [editedExpense, setEditedExpense] = useState({ amount: "", category: "" });
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,7 +54,12 @@ export default function Dashboard() {
         limit(5)
       );
       const recentIncomeSnap = await getDocs(incomeQuery);
-      const incomeRecent = recentIncomeSnap.docs.map(doc => doc.data());
+      const incomeRecent = recentIncomeSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
+
       setRecentIncome(incomeRecent);
 
       // Recent expenses (latest 5 by createdAt)
@@ -54,12 +69,69 @@ export default function Dashboard() {
         limit(5)
       );
       const recentExpenseSnap = await getDocs(expenseQuery);
-      const expenseRecent = recentExpenseSnap.docs.map(doc => doc.data());
+      const expenseRecent = recentExpenseSnap.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+
       setRecentExpenses(expenseRecent);
     };
 
     fetchData();
   }, []);
+
+  const handleDelete = async (type, id) => {
+    try {
+      await deleteDoc(doc(db, type, id));
+      alert(`${type === "incomes" ? "Income" : "Expense"} deleted!`);
+      location.reload(); // refresh the page to update list
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      alert("Failed to delete.");
+    }
+  };
+  
+
+const handleEditChange = (field, value) => {
+  setEditedIncome(prev => ({ ...prev, [field]: value }));
+};
+
+const handleSaveEdit = async () => {
+  try {
+    const docRef = doc(db, "incomes", editingIncomeId);
+    await updateDoc(docRef, {
+      amount: parseFloat(editedIncome.amount),
+      source: editedIncome.source,
+    });
+    alert("Income updated!");
+    setEditingIncomeId(null);
+    location.reload(); // reload to show updated values
+  } catch (error) {
+    console.error("Edit failed:", error);
+    alert("Could not update.");
+  }
+};
+const handleExpenseEditChange = (field, value) => {
+  setEditedExpense(prev => ({ ...prev, [field]: value }));
+};
+
+const handleSaveExpenseEdit = async () => {
+  try {
+    const docRef = doc(db, "expenses", editingExpenseId);
+    await updateDoc(docRef, {
+      amount: parseFloat(editedExpense.amount),
+      category: editedExpense.category,
+    });
+    alert("Expense updated!");
+    setEditingExpenseId(null);
+    location.reload(); // refresh to show updated result
+  } catch (error) {
+    console.error("Expense edit failed:", error);
+    alert("Could not update expense.");
+  }
+};
+
+
 
   const balance = totalIncome - totalExpense;
 
@@ -86,22 +158,121 @@ export default function Dashboard() {
         <div>
           <h2 className="text-lg font-bold mb-2">Recent Income</h2>
           <ul className="space-y-2">
-            {recentIncome.map((item, index) => (
-              <li key={index} className="p-3 border rounded-lg shadow-sm">
-                💰 ${item.amount} – {item.source || "Unknown Source"}
-              </li>
-            ))}
+          {recentIncome.map((item) => (
+  <li key={item.id} className="p-3 border rounded-lg shadow-sm">
+    {editingIncomeId === item.id ? (
+      <div className="space-y-2">
+        <input
+          type="number"
+          value={editedIncome.amount}
+          onChange={(e) => handleEditChange("amount", e.target.value)}
+          className="border p-1 w-full"
+        />
+        <input
+          type="text"
+          value={editedIncome.source}
+          onChange={(e) => handleEditChange("source", e.target.value)}
+          className="border p-1 w-full"
+        />
+        <button
+          onClick={handleSaveEdit}
+          className="bg-green-500 text-white px-2 py-1 rounded mr-2"
+        >
+          Save
+        </button>
+        <button
+          onClick={() => setEditingIncomeId(null)}
+          className="bg-gray-300 px-2 py-1 rounded"
+        >
+          Cancel
+        </button>
+      </div>
+    ) : (
+      <div className="flex justify-between items-center">
+        <span>💰 ${item.amount} – {item.source || "Unknown Source"}</span>
+        <div className="space-x-2">
+          <button
+            onClick={() => {
+              setEditingIncomeId(item.id);
+              setEditedIncome({ amount: item.amount, source: item.source });
+            }}
+            className="text-blue-500 hover:underline"
+          >
+            📝
+          </button>
+          <button
+            onClick={() => handleDelete("incomes", item.id)}
+            className="text-red-500 hover:underline"
+          >
+            🗑️
+          </button>
+        </div>
+      </div>
+    )}
+  </li>
+))}
+
           </ul>
         </div>
 
         <div>
           <h2 className="text-lg font-bold mb-2">Recent Expenses</h2>
           <ul className="space-y-2">
-            {recentExpenses.map((item, index) => (
-              <li key={index} className="p-3 border rounded-lg shadow-sm">
-                🧾 ${item.amount} – {item.category || "Unknown Category"}
+            
+            {recentExpenses.map((item) => (
+              <li key={item.id} className="p-3 border rounded-lg shadow-sm">
+                {editingExpenseId === item.id ? (
+                  <div className="space-y-2">
+                    <input
+                      type="number"
+                      value={editedExpense.amount}
+                      onChange={(e) => handleExpenseEditChange("amount", e.target.value)}
+                      className="border p-1 w-full"
+                    />
+                    <input
+                      type="text"
+                      value={editedExpense.category}
+                      onChange={(e) => handleExpenseEditChange("category", e.target.value)}
+                      className="border p-1 w-full"
+                    />
+                    <button
+                      onClick={handleSaveExpenseEdit}
+                      className="bg-green-500 text-white px-2 py-1 rounded mr-2"
+                    >
+                      Save
+                    </button>
+                    <button
+                      onClick={() => setEditingExpenseId(null)}
+                      className="bg-gray-300 px-2 py-1 rounded"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex justify-between items-center">
+                    <span>🧾 ${item.amount} – {item.category || "Unknown Category"}</span>
+                    <div className="space-x-2">
+                      <button
+                        onClick={() => {
+                          setEditingExpenseId(item.id);
+                          setEditedExpense({ amount: item.amount, category: item.category });
+                        }}
+                        className="text-blue-500 hover:underline"
+                      >
+                        📝
+                      </button>
+                      <button
+                        onClick={() => handleDelete("expenses", item.id)}
+                        className="text-red-500 hover:underline"
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                )}
               </li>
             ))}
+            
           </ul>
         </div>
       </section>
