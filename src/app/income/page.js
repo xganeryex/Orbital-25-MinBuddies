@@ -10,6 +10,8 @@ export default function IncomeForm() {
   const [amount, setAmount] = useState("");
   const [source, setSource] = useState("");
   const [note, setNote] = useState("");
+  const [customSource, setCustomSource] = useState("");
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -22,7 +24,8 @@ export default function IncomeForm() {
     try {
       await addDoc(collection(db, "incomes"), {
         amount: parseFloat(amount),
-        source,
+        source: source === "Others" ? customSource : source,
+
         note,
         createdAt: new Date(),
       });
@@ -47,13 +50,33 @@ export default function IncomeForm() {
           onChange={(e) => setAmount(e.target.value)}
           className="border p-2 w-full"
         />
-        <input
-          type="text"
-          placeholder="Source (e.g. Job, Allowance)"
-          value={source}
-          onChange={(e) => setSource(e.target.value)}
-          className="border p-2 w-full"
-        />
+        <select
+  value={source}
+  onChange={(e) => setSource(e.target.value)}
+  className="border p-2 w-full"
+>
+  <option value="">Select Source</option>
+  <option value="Salary">Salary</option>
+  <option value="Allowance">Allowance</option>
+  <option value="Freelance">Freelance</option>
+  <option value="Gift">Gift</option>
+  <option value="Others">Others</option>
+</select>
+
+{source === "Others" && (
+  <input
+    type="text"
+    placeholder="Specify other source"
+    value={customSource}
+    onChange={(e) => setCustomSource(e.target.value)}
+    className="border p-2 w-full mt-2"
+  />
+)}
+
+
+
+
+
         <input
           type="text"
           placeholder="Note (optional)"

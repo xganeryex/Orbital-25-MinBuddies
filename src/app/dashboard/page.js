@@ -5,7 +5,7 @@ import { db } from "../../firebase/firebase";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 import Link from "next/link";
 import { deleteDoc, doc } from "firebase/firestore";
-import { updateDoc } from "firebase/firestore"; // make sure this is imported
+import { updateDoc } from "firebase/firestore";
 
 
 
@@ -101,8 +101,12 @@ const handleSaveEdit = async () => {
     const docRef = doc(db, "incomes", editingIncomeId);
     await updateDoc(docRef, {
       amount: parseFloat(editedIncome.amount),
-      source: editedIncome.source,
+      source:
+        editedIncome.source === "Others"
+          ? editedIncome.otherSource
+          : editedIncome.source,
     });
+    
     alert("Income updated!");
     setEditingIncomeId(null);
     location.reload(); // reload to show updated values
@@ -120,8 +124,12 @@ const handleSaveExpenseEdit = async () => {
     const docRef = doc(db, "expenses", editingExpenseId);
     await updateDoc(docRef, {
       amount: parseFloat(editedExpense.amount),
-      category: editedExpense.category,
+      category:
+        editedExpense.category === "Others"
+          ? editedExpense.otherCategory
+          : editedExpense.category,
     });
+    
     alert("Expense updated!");
     setEditingExpenseId(null);
     location.reload(); // refresh to show updated result
@@ -168,12 +176,39 @@ const handleSaveExpenseEdit = async () => {
           onChange={(e) => handleEditChange("amount", e.target.value)}
           className="border p-1 w-full"
         />
-        <input
-          type="text"
-          value={editedIncome.source}
-          onChange={(e) => handleEditChange("source", e.target.value)}
-          className="border p-1 w-full"
-        />
+
+
+<select
+  value={editedIncome.source}
+  onChange={(e) => handleEditChange("source", e.target.value)}
+  className="border p-1 w-full"
+>
+  <option value="">Select Source</option>
+  <option value="Salary">Salary</option>
+  <option value="Allowance">Allowance</option>
+  <option value="Freelance">Freelance</option>
+  <option value="Gift">Gift</option>
+  <option value="Others">Others</option>
+</select>
+
+{editedIncome.source === "Others" && (
+  <input
+    type="text"
+    placeholder="Specify other source"
+    value={editedIncome.otherSource || ""}
+    onChange={(e) =>
+      setEditedIncome((prev) => ({
+        ...prev,
+        otherSource: e.target.value,
+      }))
+    }
+    className="border p-1 w-full"
+  />
+)}
+
+
+
+
         <button
           onClick={handleSaveEdit}
           className="bg-green-500 text-white px-2 py-1 rounded mr-2"
@@ -229,12 +264,39 @@ const handleSaveExpenseEdit = async () => {
                       onChange={(e) => handleExpenseEditChange("amount", e.target.value)}
                       className="border p-1 w-full"
                     />
-                    <input
-                      type="text"
-                      value={editedExpense.category}
-                      onChange={(e) => handleExpenseEditChange("category", e.target.value)}
-                      className="border p-1 w-full"
-                    />
+
+
+<select
+  value={editedExpense.category}
+  onChange={(e) => handleExpenseEditChange("category", e.target.value)}
+  className="border p-1 w-full"
+>
+  <option value="">Select Category</option>
+  <option value="Food">Food</option>
+  <option value="Transport">Transport</option>
+  <option value="Bills">Bills</option>
+  <option value="Shopping">Shopping</option>
+  <option value="Others">Others</option>
+</select>
+{editedExpense.category === "Others" && (
+  <input
+    type="text"
+    placeholder="Specify other category"
+    value={editedExpense.otherCategory || ""}
+    onChange={(e) =>
+      setEditedExpense((prev) => ({
+        ...prev,
+        otherCategory: e.target.value,
+      }))
+    }
+    className="border p-1 w-full"
+  />
+)}
+
+
+
+
+
                     <button
                       onClick={handleSaveExpenseEdit}
                       className="bg-green-500 text-white px-2 py-1 rounded mr-2"

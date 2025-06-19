@@ -3,6 +3,8 @@ import { useState } from "react";
 import { db } from "../../firebase/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import Link from "next/link";
+const [customCategory, setCustomCategory] = useState("");
+
 
 
 
@@ -17,7 +19,7 @@ export default function ExpenseForm() {
   try {
     await addDoc(collection(db, "expenses"), {
       amount: parseFloat(amount),
-      category,
+      category: category === "Others" ? customCategory : category,
       note,
       createdAt: new Date()
     });
@@ -44,13 +46,33 @@ export default function ExpenseForm() {
           onChange={(e) => setAmount(e.target.value)}
           className="border p-2 w-full"
         />
-        <input
-          type="text"
-          placeholder="Category"
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="border p-2 w-full"
-        />
+       <select
+  value={category}
+  onChange={(e) => setCategory(e.target.value)}
+  className="border p-2 w-full"
+>
+  <option value="">Select Category</option>
+  <option value="Food">Food</option>
+  <option value="Transport">Transport</option>
+  <option value="Bills">Bills</option>
+  <option value="Shopping">Shopping</option>
+  <option value="Others">Others</option>
+</select>
+
+{category === "Others" && (
+  <input
+    type="text"
+    placeholder="Specify other category"
+    value={customCategory}
+    onChange={(e) => setCustomCategory(e.target.value)}
+    className="border p-2 w-full mt-2"
+  />
+)}
+
+
+
+
+
         <input
           type="text"
           placeholder="Note (optional)"
