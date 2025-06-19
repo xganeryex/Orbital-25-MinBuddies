@@ -30,6 +30,9 @@ export default function Home() {
         <Link href="/dashboard" className="block bg-purple-500 text-white px-4 py-2 rounded">
           Go to Dashboard
         </Link>
+        <Link href="/budget" className="block bg-yellow-500 text-white px-4 py-2 rounded">
+          Set Budget
+        </Link>
       </div>
     </main>
   );

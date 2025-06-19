@@ -8,6 +8,7 @@ import { deleteDoc, doc } from "firebase/firestore";
 import { updateDoc } from "firebase/firestore";
 import ExpensePieChart from "../../components/ExpensePieChart";
 import IncomePieChart from "../../components/IncomePieChart";
+import IncomeExpenseBarChart from "../../components/IncomeExpenseBarChart";
 
 
 
@@ -25,6 +26,10 @@ export default function Dashboard() {
   const [incomeSourceTotals, setIncomeSourceTotals] = useState({});
   const [selectedExpenseCategory, setSelectedExpenseCategory] = useState("");
   const [selectedIncomeSource, setSelectedIncomeSource] = useState("");
+  const [allIncome, setAllIncome] = useState([]);
+  const [allExpenses, setAllExpenses] = useState([]);
+  const [alerts, setAlerts] = useState([]);
+
 
 
 
@@ -44,6 +49,8 @@ incomeSnap.forEach((doc) => {
   const data = doc.data();
   incomeSum += data.amount;
   incomeList.push(data);
+  setAllIncome(incomeList);
+
 
   const source = data.source || "Uncategorized";
   if (!sourceTotals[source]) {
@@ -64,6 +71,7 @@ expenseSnap.forEach((doc) => {
   const data = doc.data();
   expenseSum += data.amount;
   expenseList.push(data);
+  setAllExpenses(expenseList);
 
   const category = data.category || "Uncategorized";
   if (!categoryTotals[category]) {
@@ -106,7 +114,32 @@ setExpenseCategoryTotals(categoryTotals);
       }));
 
       setRecentExpenses(expenseRecent);
+
+
+const budgetSnap = await getDocs(collection(db, "budgets"));
+const budgets = budgetSnap.docs.map(doc => doc.data());
+
+const currentMonth = new Date().toISOString().slice(0, 7); // e.g., "2025-06"
+const triggeredAlerts = [];
+
+for (const budget of budgets) {
+  if (budget.month === currentMonth) {
+    const spent = expenseCategoryTotals[budget.category] || 0;
+    if (spent > budget.amount) {
+      triggeredAlerts.push({
+        category: budget.category,
+        spent,
+        limit: budget.amount,
+      });
+    }
+  }
+}
+
+setAlerts(triggeredAlerts);
     };
+
+    
+
 
     fetchData();
   }, []);
@@ -450,6 +483,25 @@ const handleSaveExpenseEdit = async () => {
   </section>
 </div>
 
+<section>
+  <h2 className="text-lg font-bold mb-2">Income vs Expense by Month</h2>
+  <IncomeExpenseBarChart incomeData={allIncome} expenseData={allExpenses} />
+  
+</section>
+  
+{alerts.length > 0 && (
+  <section className="bg-red-100 border border-red-400 p-4 rounded text-red-800">
+    <h2 className="text-lg font-bold mb-2">🚨 Budget Alerts</h2>
+    <ul className="space-y-1">
+      {alerts.map((alert, idx) => (
+        <li key={idx}>
+          ⚠️ <strong>{alert.category}</strong>: spent ${alert.spent.toFixed(2)} / budget ${alert.limit.toFixed(2)}
+        </li>
+      ))}
+    </ul>
+  </section>
+)}
+
 
 
 <div className="mt-6 text-center">
@@ -460,6 +512,7 @@ const handleSaveExpenseEdit = async () => {
     ← Back to Home
   </Link>
 </div>
+
 
 
     </main>
