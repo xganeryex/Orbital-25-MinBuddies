@@ -21,6 +21,9 @@ export default function Dashboard() {
   const [editedExpense, setEditedExpense] = useState({ amount: "", category: "" });
   const [expenseCategoryTotals, setExpenseCategoryTotals] = useState({});
   const [incomeSourceTotals, setIncomeSourceTotals] = useState({});
+  const [selectedExpenseCategory, setSelectedExpenseCategory] = useState("");
+  const [selectedIncomeSource, setSelectedIncomeSource] = useState("");
+
 
 
   
@@ -173,6 +176,41 @@ const handleSaveExpenseEdit = async () => {
     <main className="p-6 space-y-6">
       <h1 className="text-2xl font-bold text-center text-indigo-600">Dashboard</h1>
 
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+      <div>
+    <label className="block font-semibold mb-1">Filter Income by Source</label>
+    <select
+      value={selectedIncomeSource}
+      onChange={(e) => setSelectedIncomeSource(e.target.value)}
+      className="border p-2 w-full"
+    >
+      <option value="">All Sources</option>
+      <option value="Salary">Salary</option>
+      <option value="Allowance">Allowance</option>
+      <option value="Freelance">Freelance</option>
+      <option value="Gift">Gift</option>
+      <option value="Others">Others</option>
+    </select>
+  </div>
+  <div>
+    <label className="block font-semibold mb-1">Filter Expenses by Category</label>
+    <select
+      value={selectedExpenseCategory}
+      onChange={(e) => setSelectedExpenseCategory(e.target.value)}
+      className="border p-2 w-full"
+    >
+      <option value="">All Categories</option>
+      <option value="Food">Food</option>
+      <option value="Transport">Transport</option>
+      <option value="Bills">Bills</option>
+      <option value="Shopping">Shopping</option>
+      <option value="Others">Others</option>
+    </select>
+  </div>
+
+  
+</div>
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-white font-semibold">
         <div className="bg-green-500 p-4 rounded-lg text-center">
           <p>Total Income</p>
@@ -192,7 +230,12 @@ const handleSaveExpenseEdit = async () => {
         <div>
           <h2 className="text-lg font-bold mb-2">Recent Income</h2>
           <ul className="space-y-2">
-          {recentIncome.map((item) => (
+          {recentIncome
+  .filter((item) =>
+    selectedIncomeSource ? item.source === selectedIncomeSource : true
+  )
+  .map((item) => (
+
   <li key={item.id} className="p-3 border rounded-lg shadow-sm">
     {editingIncomeId === item.id ? (
       <div className="space-y-2">
@@ -280,7 +323,12 @@ const handleSaveExpenseEdit = async () => {
           <h2 className="text-lg font-bold mb-2">Recent Expenses</h2>
           <ul className="space-y-2">
             
-            {recentExpenses.map((item) => (
+          {recentExpenses
+  .filter((item) =>
+    selectedExpenseCategory ? item.category === selectedExpenseCategory : true
+  )
+  .map((item) => (
+
               <li key={item.id} className="p-3 border rounded-lg shadow-sm">
                 {editingExpenseId === item.id ? (
                   <div className="space-y-2">
