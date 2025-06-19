@@ -19,6 +19,10 @@ export default function Dashboard() {
   const [editedIncome, setEditedIncome] = useState({ amount: "", source: "" });
   const [editingExpenseId, setEditingExpenseId] = useState(null);
   const [editedExpense, setEditedExpense] = useState({ amount: "", category: "" });
+  const [expenseCategoryTotals, setExpenseCategoryTotals] = useState({});
+  const [incomeSourceTotals, setIncomeSourceTotals] = useState({});
+
+
   
 
   useEffect(() => {
@@ -29,20 +33,42 @@ export default function Dashboard() {
       // Fetch income
       const incomeSnap = await getDocs(collection(db, "incomes"));
       const incomeList = [];
-      incomeSnap.forEach((doc) => {
-        const data = doc.data();
-        incomeSum += data.amount;
-        incomeList.push(data);
-      });
+      const sourceTotals = {};
+
+incomeSnap.forEach((doc) => {
+  const data = doc.data();
+  incomeSum += data.amount;
+  incomeList.push(data);
+
+  const source = data.source || "Uncategorized";
+  if (!sourceTotals[source]) {
+    sourceTotals[source] = 0;
+  }
+  sourceTotals[source] += data.amount;
+});
+
+setIncomeSourceTotals(sourceTotals);
+
 
       // Fetch expenses
       const expenseSnap = await getDocs(collection(db, "expenses"));
       const expenseList = [];
-      expenseSnap.forEach((doc) => {
-        const data = doc.data();
-        expenseSum += data.amount;
-        expenseList.push(data);
-      });
+      const categoryTotals = {};
+
+expenseSnap.forEach((doc) => {
+  const data = doc.data();
+  expenseSum += data.amount;
+  expenseList.push(data);
+
+  const category = data.category || "Uncategorized";
+  if (!categoryTotals[category]) {
+    categoryTotals[category] = 0;
+  }
+  categoryTotals[category] += data.amount;
+});
+
+setExpenseCategoryTotals(categoryTotals);
+
 
       setTotalIncome(incomeSum);
       setTotalExpense(expenseSum);
@@ -340,6 +366,30 @@ const handleSaveExpenseEdit = async () => {
       </section>
 
       <div className="mt-6 text-center">
+      <section>
+  <h2 className="text-lg font-bold mt-6 mb-2">Income by Source</h2>
+  <ul className="space-y-1">
+    {Object.entries(incomeSourceTotals).map(([source, total]) => (
+      <li key={source} className="text-gray-800">
+        • {source}: ${total.toFixed(2)}
+      </li>
+    ))}
+  </ul>
+</section>
+
+
+
+      <section>
+  <h2 className="text-lg font-bold mt-6 mb-2">Expenses by Category</h2>
+  <ul className="space-y-1">
+    {Object.entries(expenseCategoryTotals).map(([category, total]) => (
+      <li key={category} className="text-gray-800">
+        • {category}: ${total.toFixed(2)}
+      </li>
+    ))}
+  </ul>
+</section>
+
   <Link
     href="/"
     className="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"

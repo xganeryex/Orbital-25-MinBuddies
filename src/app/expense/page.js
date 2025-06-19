@@ -3,7 +3,7 @@ import { useState } from "react";
 import { db } from "../../firebase/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import Link from "next/link";
-const [customCategory, setCustomCategory] = useState("");
+
 
 
 
@@ -12,7 +12,7 @@ export default function ExpenseForm() {
   const [amount, setAmount] = useState("");
   const [category, setCategory] = useState("");
   const [note, setNote] = useState("");
-
+  const [customCategory, setCustomCategory] = useState("");
   const handleSubmit = async (e) => {
   e.preventDefault();
 
