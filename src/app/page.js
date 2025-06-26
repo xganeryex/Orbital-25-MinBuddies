@@ -17,7 +17,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="p-4 text-center">
+    <main className="p-4 text-center" suppressHydrationWarning={true}>
       <h1 className="text-2xl font-bold text-green-600 mb-4">SavePal</h1>
 
       <div className="mt-8 space-y-4">
