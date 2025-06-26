@@ -4,13 +4,13 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAtStgyCbjESUzITRy-o7ywVMcEpC5bwafg",
+  apiKey: "AIzaSyAtStgyCbjESUzITRy-o7ywVMEpC5bwafg",
   authDomain: "savepal-30f07.firebaseapp.com",
   projectId: "savepal-30f07",
-  storageBucket: "savepal-30f07.appspot.com",
+  storageBucket: "savepal-30f07.firebasestorage.app",
   messagingSenderId: "782974981413",
-  appId: "1:782974981413:web:0ac83b514b1f3a76c2b6cc",
-  measurementId: "G-DQ5QJWSVL8"
+  appId: "1:782974981413:web:e95e9924200fc91ac2b6cc",
+  measurementId: "G-XEMXF1RJ87"
 };
 
 const app = initializeApp(firebaseConfig);
