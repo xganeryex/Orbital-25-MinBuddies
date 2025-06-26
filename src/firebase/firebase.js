@@ -9,10 +9,12 @@ const firebaseConfig = {
   projectId: "savepal-30f07",
   storageBucket: "savepal-30f07.appspot.com",
   messagingSenderId: "782974981413",
-  appId: "1:782974981413:web:0ac03b514b1f3a76c2b6cc"
+  appId: "1:782974981413:web:0ac03b514b1f3a76c2b6cc",
+  measurementId: "G-DQ5QJWSVL8"
 };
 
 const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
