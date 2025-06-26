@@ -1,11 +1,16 @@
 // src/app/page.js
 "use client";
-import { db } from "../firebase/firebase";
+
+import { db, auth } from "../firebase/firebase";
 import { collection, getDocs } from "firebase/firestore";
+import { signOut } from "firebase/auth";
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function Home() {
+  const router = useRouter();
+
   useEffect(() => {
     const test = async () => {
       const querySnapshot = await getDocs(collection(db, "expenses"));
@@ -16,11 +21,27 @@ export default function Home() {
     test();
   }, []);
 
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/login");
+    } catch (error) {
+      alert("Logout failed: " + error.message);
+    }
+  };
+
   return (
     <main className="p-4 text-center" suppressHydrationWarning={true}>
       <h1 className="text-2xl font-bold text-green-600 mb-4">SavePal</h1>
 
-      <div className="mt-8 space-y-4">
+      <button
+        onClick={handleLogout}
+        className="bg-red-500 text-white px-4 py-2 rounded mb-6"
+      >
+        Log Out
+      </button>
+
+      <div className="mt-4 space-y-4">
         <Link href="/income" className="block bg-blue-500 text-white px-4 py-2 rounded">
           Go to Income Form
         </Link>
