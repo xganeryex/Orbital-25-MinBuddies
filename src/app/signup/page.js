@@ -11,6 +11,8 @@ export default function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
+      console.log("Email:", email);
+      console.log("Password:", password);
       await createUserWithEmailAndPassword(auth, email, password);
       alert("Signup successful!");
     } catch (err) {
