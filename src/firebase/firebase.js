@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAtStgyCbjESUzITRy-o7ywVMcEpC5bwafg", // <-- cần chính xác
+  apiKey: "AIzaSyAtStgyCbjESUzITRy-o7ywVMcEpC5bwafg",
   authDomain: "savepal-30f07.firebaseapp.com",
   projectId: "savepal-30f07",
   storageBucket: "savepal-30f07.appspot.com",
