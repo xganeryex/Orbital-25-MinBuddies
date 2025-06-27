@@ -1,9 +1,11 @@
+//src/app/login/page.js
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { auth } from "../../firebase/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
+import Link from "next/link";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -46,6 +48,14 @@ export default function Login() {
           Login
         </button>
       </form>
+
+      <p className="text-sm mt-4 text-center">
+        Don't have an account?{" "}
+        <Link href="/signup" className="text-blue-500 underline">
+          Sign up here
+        </Link>
+      </p>
     </main>
   );
 }
+
