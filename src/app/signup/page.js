@@ -1,20 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { auth } from "../../firebase/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
+import Link from "next/link";
 
 export default function Signup() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
 
   const handleSignup = async (e) => {
     e.preventDefault();
     try {
-      console.log("Email:", email);
-      console.log("Password:", password);
       await createUserWithEmailAndPassword(auth, email, password);
-      alert("Signup successful!");
+      alert("Signup successful! Redirecting to login...");
+      router.push("/login");  // Redirect after signup
     } catch (err) {
       alert(err.message);
     }
@@ -45,6 +47,13 @@ export default function Signup() {
           Sign Up
         </button>
       </form>
+
+      <p className="text-sm mt-4 text-center">
+        Already have an account?{" "}
+        <Link href="/login" className="text-blue-500 underline">
+          Log in here
+        </Link>
+      </p>
     </main>
   );
 }
