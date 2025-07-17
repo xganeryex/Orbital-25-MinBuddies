@@ -88,7 +88,7 @@ export default function Dashboard() {
         const data = doc.data();
         expenseSum += data.amount;
         expenseList.push(data);
-        setAllExpenses(expenseList);
+        
   
         const category = data.category || "Uncategorized";
         if (!categoryTotals[category]) {
@@ -96,7 +96,9 @@ export default function Dashboard() {
         }
         categoryTotals[category] += data.amount;
       });
-  
+
+
+      setAllExpenses(expenseList);
       setExpenseCategoryTotals(categoryTotals);
       setTotalIncome(incomeSum);
       setTotalExpense(expenseSum);
