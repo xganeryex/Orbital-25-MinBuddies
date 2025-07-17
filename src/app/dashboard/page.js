@@ -1,8 +1,11 @@
 "use client";
 
+import { auth } from "../../firebase/firebase";
+import { onAuthStateChanged } from "firebase/auth";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { db } from "../../firebase/firebase";
-import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+import { collection, getDocs, query, orderBy, limit, where } from "firebase/firestore";
 import Link from "next/link";
 import { deleteDoc, doc } from "firebase/firestore";
 import { updateDoc } from "firebase/firestore";
@@ -14,6 +17,9 @@ import IncomeExpenseBarChart from "../../components/IncomeExpenseBarChart";
 
 
 export default function Dashboard() {
+  const router = useRouter();
+  const [user, setUser] = useState(null);
+
   const [totalIncome, setTotalIncome] = useState(0);
   const [totalExpense, setTotalExpense] = useState(0);
   const [recentIncome, setRecentIncome] = useState([]);
@@ -35,115 +41,120 @@ export default function Dashboard() {
 
 
   
-
   useEffect(() => {
-    const fetchData = async () => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUser(user);
+        fetchData(user);
+      } else {
+        router.push("/login");
+      }
+    });
+  
+    async function fetchData(user) {
       let incomeSum = 0;
       let expenseSum = 0;
-
+  
       // Fetch income
-      const incomeSnap = await getDocs(collection(db, "incomes"));
+      const incomeSnap = await getDocs(
+        query(collection(db, "incomes"), where("userId", "==", user.uid))
+      );
       const incomeList = [];
       const sourceTotals = {};
-
-incomeSnap.forEach((doc) => {
-  const data = doc.data();
-  incomeSum += data.amount;
-  incomeList.push(data);
-  setAllIncome(incomeList);
-
-
-  const source = data.source || "Uncategorized";
-  if (!sourceTotals[source]) {
-    sourceTotals[source] = 0;
-  }
-  sourceTotals[source] += data.amount;
-});
-
-setIncomeSourceTotals(sourceTotals);
-
-
+  
+      incomeSnap.forEach((doc) => {
+        const data = doc.data();
+        incomeSum += data.amount;
+        incomeList.push(data);
+        setAllIncome(incomeList);
+  
+        const source = data.source || "Uncategorized";
+        if (!sourceTotals[source]) {
+          sourceTotals[source] = 0;
+        }
+        sourceTotals[source] += data.amount;
+      });
+  
+      setIncomeSourceTotals(sourceTotals);
+  
       // Fetch expenses
-      const expenseSnap = await getDocs(collection(db, "expenses"));
+      const expenseSnap = await getDocs(
+        query(collection(db, "expenses"), where("userId", "==", user.uid))
+      );
       const expenseList = [];
       const categoryTotals = {};
-
-expenseSnap.forEach((doc) => {
-  const data = doc.data();
-  expenseSum += data.amount;
-  expenseList.push(data);
-  setAllExpenses(expenseList);
-
-  const category = data.category || "Uncategorized";
-  if (!categoryTotals[category]) {
-    categoryTotals[category] = 0;
-  }
-  categoryTotals[category] += data.amount;
-});
-
-setExpenseCategoryTotals(categoryTotals);
-
-
+  
+      expenseSnap.forEach((doc) => {
+        const data = doc.data();
+        expenseSum += data.amount;
+        expenseList.push(data);
+        setAllExpenses(expenseList);
+  
+        const category = data.category || "Uncategorized";
+        if (!categoryTotals[category]) {
+          categoryTotals[category] = 0;
+        }
+        categoryTotals[category] += data.amount;
+      });
+  
+      setExpenseCategoryTotals(categoryTotals);
       setTotalIncome(incomeSum);
       setTotalExpense(expenseSum);
-
-      // Recent income (latest 5 by createdAt)
+  
+      // Recent income
       const incomeQuery = query(
         collection(db, "incomes"),
+        where("userId", "==", user.uid),
         orderBy("createdAt", "desc"),
         limit(5)
       );
+      
       const recentIncomeSnap = await getDocs(incomeQuery);
-      const incomeRecent = recentIncomeSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-
-      setRecentIncome(incomeRecent);
-
-      // Recent expenses (latest 5 by createdAt)
+      setRecentIncome(
+        recentIncomeSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      );
+  
+      // Recent expenses
       const expenseQuery = query(
         collection(db, "expenses"),
+        where("userId", "==", user.uid),
         orderBy("createdAt", "desc"),
         limit(5)
       );
+      
       const recentExpenseSnap = await getDocs(expenseQuery);
-      const expenseRecent = recentExpenseSnap.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      }));
-
-      setRecentExpenses(expenseRecent);
-
-
-const budgetSnap = await getDocs(collection(db, "budgets"));
-const budgets = budgetSnap.docs.map(doc => doc.data());
-
-const currentMonth = new Date().toISOString().slice(0, 7); // e.g., "2025-06"
-const triggeredAlerts = [];
-
-for (const budget of budgets) {
-  if (budget.month === currentMonth) {
-    const spent = expenseCategoryTotals[budget.category] || 0;
-    if (spent > budget.amount) {
-      triggeredAlerts.push({
-        category: budget.category,
-        spent,
-        limit: budget.amount,
-      });
+      setRecentExpenses(
+        recentExpenseSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      );
+  
+      // Budgets and alerts
+      const budgetSnap = await getDocs(
+        query(collection(db, "budgets"), where("userId", "==", user.uid))
+      );
+      const budgets = budgetSnap.docs.map(doc => doc.data());
+  
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const triggeredAlerts = [];
+  
+      for (const budget of budgets) {
+        if (budget.month === currentMonth) {
+          const spent = expenseCategoryTotals[budget.category] || 0;
+          if (spent > budget.amount) {
+            triggeredAlerts.push({
+              category: budget.category,
+              spent,
+              limit: budget.amount,
+            });
+          }
+        }
+      }
+  
+      setAlerts(triggeredAlerts);
     }
-  }
-}
-
-setAlerts(triggeredAlerts);
-    };
-
-    
-
-
-    fetchData();
+  
+    return () => unsubscribe();
   }, []);
+  
 
   const handleDelete = async (type, id) => {
     try {
@@ -207,6 +218,10 @@ const handleSaveExpenseEdit = async () => {
 
 
   const balance = totalIncome - totalExpense;
+
+  if (!user) {
+    return <p className="text-center mt-10">Loading...</p>;
+  }
 
   return (
     <main className="p-6 space-y-6">

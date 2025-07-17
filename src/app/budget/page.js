@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { db } from "../../firebase/firebase";
+import { db, auth } from "../../firebase/firebase";
 import Link from "next/link";
+import { useAuthState } from "react-firebase-hooks/auth";
 import {
   collection,
   addDoc,
@@ -13,29 +14,38 @@ import {
 } from "firebase/firestore";
 
 export default function BudgetPage() {
+  const [user] = useAuthState(auth);
+
   const [category, setCategory] = useState("");
   const [amount, setAmount] = useState("");
   const [month, setMonth] = useState("");
   const [budgets, setBudgets] = useState([]);
-
   const [editingId, setEditingId] = useState(null);
 
-  // 🧠 Fetch budgets
   useEffect(() => {
     const fetchBudgets = async () => {
+      if (!user) return;
+
       const querySnapshot = await getDocs(collection(db, "budgets"));
-      const data = querySnapshot.docs.map((docSnap) => ({
-        id: docSnap.id,
-        ...docSnap.data(),
-      }));
+      const data = querySnapshot.docs
+        .map((docSnap) => ({
+          id: docSnap.id,
+          ...docSnap.data(),
+        }))
+        .filter((b) => b.userId === user.uid); // filter by current user
       setBudgets(data);
     };
-    fetchBudgets();
-  }, []);
 
-  // ✅ Add or Update budget
+    fetchBudgets();
+  }, [user]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!user) {
+      alert("You must be logged in to set budgets.");
+      return;
+    }
 
     if (!category || !amount || !month) {
       alert("Please fill in all fields.");
@@ -44,19 +54,19 @@ export default function BudgetPage() {
 
     try {
       if (editingId) {
-        // Update existing
         await updateDoc(doc(db, "budgets", editingId), {
           category,
           amount: parseFloat(amount),
           month,
+          userId: user.uid,
         });
         alert("Budget updated!");
       } else {
-        // Add new
         await addDoc(collection(db, "budgets"), {
           category,
           amount: parseFloat(amount),
           month,
+          userId: user.uid,
         });
         alert("Budget saved!");
       }
@@ -72,7 +82,6 @@ export default function BudgetPage() {
     }
   };
 
-  // ❌ Delete budget
   const handleDelete = async (id) => {
     if (confirm("Delete this budget?")) {
       try {
@@ -86,7 +95,6 @@ export default function BudgetPage() {
     }
   };
 
-  // ✏️ Start editing
   const handleEdit = (budget) => {
     setCategory(budget.category);
     setAmount(budget.amount.toString());
@@ -101,30 +109,28 @@ export default function BudgetPage() {
       </h1>
 
       <form onSubmit={handleSubmit} className="space-y-4">
-      <select
-  value={category}
-  onChange={(e) => setCategory(e.target.value)}
-  className="border p-2 w-full"
->
-  <option value="">Select Category</option>
-  <option value="Food">Food</option>
-  <option value="Transport">Transport</option>
-  <option value="Bills">Bills</option>
-  <option value="Shopping">Shopping</option>
-  <option value="Others">Others</option>
-</select>
+        <select
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          className="border p-2 w-full"
+        >
+          <option value="">Select Category</option>
+          <option value="Food">Food</option>
+          <option value="Transport">Transport</option>
+          <option value="Bills">Bills</option>
+          <option value="Shopping">Shopping</option>
+          <option value="Others">Others</option>
+        </select>
 
-{category === "Others" && (
-  <input
-    type="text"
-    placeholder="Specify category"
-    value={category.startsWith("Other:") ? category.slice(6) : ""}
-    onChange={(e) => setCategory(`Other:${e.target.value}`)}
-    className="border p-2 w-full"
-  />
-)}
-
-
+        {category === "Others" && (
+          <input
+            type="text"
+            placeholder="Specify category"
+            value={category.startsWith("Other:") ? category.slice(6) : ""}
+            onChange={(e) => setCategory(`Other:${e.target.value}`)}
+            className="border p-2 w-full"
+          />
+        )}
 
         <input
           type="number"
@@ -133,6 +139,7 @@ export default function BudgetPage() {
           onChange={(e) => setAmount(e.target.value)}
           className="border p-2 w-full"
         />
+
         <input
           type="month"
           value={month}
@@ -168,7 +175,10 @@ export default function BudgetPage() {
         <h2 className="text-lg font-bold mb-2">Current Budgets</h2>
         <ul className="space-y-2">
           {budgets.map((b) => (
-            <li key={b.id} className="p-3 border rounded flex justify-between items-center">
+            <li
+              key={b.id}
+              className="p-3 border rounded flex justify-between items-center"
+            >
               <span>
                 🏷️ {b.category} — ${b.amount.toFixed(2)} ({b.month})
               </span>
@@ -192,13 +202,13 @@ export default function BudgetPage() {
       </div>
 
       <div className="mt-6 text-center">
-  <Link
-    href="/"
-    className="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
-  >
-    ← Back to Home
-  </Link>
-</div>
+        <Link
+          href="/"
+          className="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
+        >
+          ← Back to Home
+        </Link>
+      </div>
     </main>
   );
 }
