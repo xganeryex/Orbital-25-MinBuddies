@@ -12,6 +12,7 @@ import {
   doc,
   updateDoc,
 } from "firebase/firestore";
+import { motion } from "framer-motion";
 
 export default function BudgetPage() {
   const [user] = useAuthState(auth);
@@ -32,7 +33,7 @@ export default function BudgetPage() {
           id: docSnap.id,
           ...docSnap.data(),
         }))
-        .filter((b) => b.userId === user.uid); // filter by current user
+        .filter((b) => b.userId === user.uid);
       setBudgets(data);
     };
 
@@ -104,15 +105,27 @@ export default function BudgetPage() {
 
   return (
     <main className="p-4 max-w-xl mx-auto">
-      <h1 className="text-xl font-bold mb-4">
+      <motion.h1
+        className="text-xl font-bold mb-4"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
         {editingId ? "Edit Budget" : "Set Monthly Budget"}
-      </h1>
+      </motion.h1>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <select
+      <motion.form
+        onSubmit={handleSubmit}
+        className="space-y-4"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="border p-2 w-full"
+          whileFocus={{ scale: 1.02 }}
         >
           <option value="">Select Category</option>
           <option value="Food">Food</option>
@@ -120,42 +133,47 @@ export default function BudgetPage() {
           <option value="Bills">Bills</option>
           <option value="Shopping">Shopping</option>
           <option value="Others">Others</option>
-        </select>
+        </motion.select>
 
         {category === "Others" && (
-          <input
+          <motion.input
             type="text"
             placeholder="Specify category"
             value={category.startsWith("Other:") ? category.slice(6) : ""}
             onChange={(e) => setCategory(`Other:${e.target.value}`)}
             className="border p-2 w-full"
+            whileFocus={{ scale: 1.02 }}
           />
         )}
 
-        <input
+        <motion.input
           type="number"
           placeholder="Amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="border p-2 w-full"
+          whileFocus={{ scale: 1.02 }}
         />
 
-        <input
+        <motion.input
           type="month"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
           className="border p-2 w-full"
+          whileFocus={{ scale: 1.02 }}
         />
 
         <div className="flex gap-2">
-          <button
+          <motion.button
             type="submit"
             className="bg-yellow-500 text-white px-4 py-2 rounded"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
           >
             {editingId ? "Update Budget" : "Save Budget"}
-          </button>
+          </motion.button>
           {editingId && (
-            <button
+            <motion.button
               type="button"
               onClick={() => {
                 setCategory("");
@@ -164,20 +182,30 @@ export default function BudgetPage() {
                 setEditingId(null);
               }}
               className="bg-gray-300 px-4 py-2 rounded"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
             >
               Cancel
-            </button>
+            </motion.button>
           )}
         </div>
-      </form>
+      </motion.form>
 
-      <div className="mt-8">
+      <motion.div
+        className="mt-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+      >
         <h2 className="text-lg font-bold mb-2">Current Budgets</h2>
         <ul className="space-y-2">
-          {budgets.map((b) => (
-            <li
+          {budgets.map((b, i) => (
+            <motion.li
               key={b.id}
               className="p-3 border rounded flex justify-between items-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: i * 0.1 }}
             >
               <span>
                 🏷️ {b.category} — ${b.amount.toFixed(2)} ({b.month})
@@ -196,19 +224,24 @@ export default function BudgetPage() {
                   🗑️
                 </button>
               </div>
-            </li>
+            </motion.li>
           ))}
         </ul>
-      </div>
+      </motion.div>
 
-      <div className="mt-6 text-center">
+      <motion.div
+        className="mt-6 text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.5 }}
+      >
         <Link
           href="/"
           className="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
         >
           ← Back to Home
         </Link>
-      </div>
+      </motion.div>
     </main>
   );
 }
