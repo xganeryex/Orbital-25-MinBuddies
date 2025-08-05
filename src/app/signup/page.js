@@ -17,7 +17,7 @@ export default function Signup() {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       alert("Signup successful! Redirecting to login...");
-      router.push("/login");
+      router.push("/welcome");
     } catch (err) {
       alert(err.message);
     }
