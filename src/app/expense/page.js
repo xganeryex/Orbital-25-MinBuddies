@@ -4,6 +4,7 @@ import { db, auth } from "../../firebase/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import Link from "next/link";
 import { useAuthState } from "react-firebase-hooks/auth";
+import { motion } from "framer-motion";
 
 export default function ExpenseForm() {
   const [user] = useAuthState(auth);
@@ -47,20 +48,36 @@ export default function ExpenseForm() {
 
   return (
     <main className="p-4">
-      <h1 className="text-xl font-bold mb-4">Log Expense</h1>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
+      <motion.h1
+        className="text-xl font-bold mb-4"
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+      >
+        Log Expense
+      </motion.h1>
+
+      <motion.form
+        onSubmit={handleSubmit}
+        className="space-y-4"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <motion.input
           type="number"
           placeholder="Amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="border p-2 w-full"
+          whileFocus={{ scale: 1.02 }}
         />
 
-        <select
+        <motion.select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           className="border p-2 w-full"
+          whileFocus={{ scale: 1.02 }}
         >
           <option value="">Select Category</option>
           <option value="Food">Food</option>
@@ -68,42 +85,51 @@ export default function ExpenseForm() {
           <option value="Bills">Bills</option>
           <option value="Shopping">Shopping</option>
           <option value="Others">Others</option>
-        </select>
+        </motion.select>
 
         {category === "Others" && (
-          <input
+          <motion.input
             type="text"
             placeholder="Specify other category"
             value={customCategory}
             onChange={(e) => setCustomCategory(e.target.value)}
             className="border p-2 w-full mt-2"
+            whileFocus={{ scale: 1.02 }}
           />
         )}
 
-        <input
+        <motion.input
           type="text"
           placeholder="Note (optional)"
           value={note}
           onChange={(e) => setNote(e.target.value)}
           className="border p-2 w-full"
+          whileFocus={{ scale: 1.02 }}
         />
 
-        <button
+        <motion.button
           type="submit"
           className="bg-green-500 text-white px-4 py-2 rounded"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
         >
           Add Expense
-        </button>
-      </form>
+        </motion.button>
+      </motion.form>
 
-      <div className="mt-6 text-center">
+      <motion.div
+        className="mt-6 text-center"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.3 }}
+      >
         <Link
           href="/"
           className="inline-block bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300"
         >
           ← Back to Home
         </Link>
-      </div>
+      </motion.div>
     </main>
   );
 }
