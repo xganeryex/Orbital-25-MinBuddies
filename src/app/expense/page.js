@@ -44,12 +44,10 @@ export default function ExpenseForm() {
     }
 
     try {
-      // Lấy ngân sách
       const budgetRef = doc(db, "budgets", `${user.uid}_${finalCategory}`);
       const budgetSnap = await getDoc(budgetRef);
       const budgetLimit = budgetSnap.exists() ? budgetSnap.data().amount : null;
-
-      // Tổng chi tiêu hiện tại trong tháng
+      
       const firstDayOfMonth = new Date(
         new Date().getFullYear(),
         new Date().getMonth(),
@@ -68,7 +66,7 @@ export default function ExpenseForm() {
       );
       const newTotal = totalSoFar + parsedAmount;
 
-      // Lưu expense
+      // save expense
       await addDoc(collection(db, "expenses"), {
         amount: parsedAmount,
         category: finalCategory,
@@ -82,7 +80,7 @@ export default function ExpenseForm() {
       if (budgetLimit && newTotal > budgetLimit) {
         setTimeout(() => {
           toast.warning("⚠️ You have exceeded your budget for this category!");
-        }, 800); 
+        }, 10000); 
       }
 
       // Reset form
