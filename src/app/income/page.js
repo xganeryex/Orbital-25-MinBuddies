@@ -84,14 +84,14 @@ export default function IncomeForm() {
           placeholder="Amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="border p-2 w-full"
+          className="border p-2 w-full bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600"
           whileFocus={{ scale: 1.02 }}
         />
 
         <motion.select
           value={source}
           onChange={(e) => setSource(e.target.value)}
-          className="border p-2 w-full"
+          className="border p-2 w-full bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600"
           whileFocus={{ scale: 1.02 }}
         >
           <option value="">Select Source</option>
@@ -108,7 +108,7 @@ export default function IncomeForm() {
             placeholder="Specify other source"
             value={customSource}
             onChange={(e) => setCustomSource(e.target.value)}
-            className="border p-2 w-full mt-2"
+            className="border p-2 w-full mt-2 bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600"
             whileFocus={{ scale: 1.02 }}
           />
         )}
@@ -118,7 +118,7 @@ export default function IncomeForm() {
           placeholder="Note (optional)"
           value={note}
           onChange={(e) => setNote(e.target.value)}
-          className="border p-2 w-full"
+          className="border p-2 w-full bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600"
           whileFocus={{ scale: 1.02 }}
         />
 
