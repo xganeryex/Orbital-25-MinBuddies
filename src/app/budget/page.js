@@ -124,7 +124,7 @@ export default function BudgetPage() {
         <motion.select
           value={category}
           onChange={(e) => setCategory(e.target.value)}
-          className="border p-2 w-full"
+          className="border p-2 w-full bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600 transition duration-200"
           whileFocus={{ scale: 1.02 }}
         >
           <option value="">Select Category</option>
@@ -141,7 +141,7 @@ export default function BudgetPage() {
             placeholder="Specify category"
             value={category.startsWith("Other:") ? category.slice(6) : ""}
             onChange={(e) => setCategory(`Other:${e.target.value}`)}
-            className="border p-2 w-full"
+            className="border p-2 w-full bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600 transition duration-200"
             whileFocus={{ scale: 1.02 }}
           />
         )}
@@ -151,7 +151,7 @@ export default function BudgetPage() {
           placeholder="Amount"
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
-          className="border p-2 w-full"
+          className="border p-2 w-full bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600 transition duration-200"
           whileFocus={{ scale: 1.02 }}
         />
 
@@ -159,7 +159,7 @@ export default function BudgetPage() {
           type="month"
           value={month}
           onChange={(e) => setMonth(e.target.value)}
-          className="border p-2 w-full"
+          className="border p-2 w-full bg-white text-black dark:bg-gray-800 dark:text-white dark:border-gray-600 transition duration-200"
           whileFocus={{ scale: 1.02 }}
         />
 
