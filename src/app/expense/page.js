@@ -36,12 +36,20 @@ export default function ExpenseForm() {
     }
 
     const finalCategory = category === "Others" ? customCategory : category;
+    const parsedAmount = parseFloat(amount);
+
+    if (isNaN(parsedAmount)) {
+      toast.error("Amount must be a valid number.");
+      return;
+    }
 
     try {
+      // Lấy ngân sách
       const budgetRef = doc(db, "budgets", `${user.uid}_${finalCategory}`);
       const budgetSnap = await getDoc(budgetRef);
       const budgetLimit = budgetSnap.exists() ? budgetSnap.data().amount : null;
 
+      // Tổng chi tiêu hiện tại trong tháng
       const firstDayOfMonth = new Date(
         new Date().getFullYear(),
         new Date().getMonth(),
@@ -58,22 +66,28 @@ export default function ExpenseForm() {
         (sum, doc) => sum + doc.data().amount,
         0
       );
+      const newTotal = totalSoFar + parsedAmount;
 
-      const newTotal = totalSoFar + parseFloat(amount);
-
-      if (budgetLimit && newTotal > budgetLimit) {
-        toast.warning("⚠️ You have exceeded your budget for this category!");
-      }
-
+      // Lưu expense
       await addDoc(collection(db, "expenses"), {
-        amount: parseFloat(amount),
+        amount: parsedAmount,
         category: finalCategory,
         note,
         createdAt: new Date(),
         userId: user.uid,
       });
 
-      toast.success("Expense added!");
+      // Hiển thị toast thành công trước
+      toast.success("✅ Expense added!");
+
+      // Sau đó cảnh báo nếu vượt ngân sách
+      if (budgetLimit && newTotal > budgetLimit) {
+        setTimeout(() => {
+          toast.warning("⚠️ You have exceeded your budget for this category!");
+        }, 800); // Delay 800ms để toast success hiển thị trước
+      }
+
+      // Reset form
       setAmount("");
       setCategory("");
       setNote("");
