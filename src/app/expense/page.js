@@ -77,14 +77,12 @@ export default function ExpenseForm() {
         userId: user.uid,
       });
 
-      // Hiển thị toast thành công trước
       toast.success("✅ Expense added!");
 
-      // Sau đó cảnh báo nếu vượt ngân sách
       if (budgetLimit && newTotal > budgetLimit) {
         setTimeout(() => {
           toast.warning("⚠️ You have exceeded your budget for this category!");
-        }, 800); // Delay 800ms để toast success hiển thị trước
+        }, 800); 
       }
 
       // Reset form
