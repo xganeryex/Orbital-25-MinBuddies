@@ -37,17 +37,18 @@ export default function ExpenseForm() {
 
     const finalCategory = category === "Others" ? customCategory : category;
     const parsedAmount = parseFloat(amount);
-
     if (isNaN(parsedAmount)) {
       toast.error("Amount must be a valid number.");
       return;
     }
 
     try {
-      const budgetRef = doc(db, "budgets", `${user.uid}_${finalCategory}`);
+      const currentMonth = new Date().toISOString().slice(0, 7); // e.g., "2025-08"
+      const budgetDocId = `${user.uid}_${finalCategory}_${currentMonth}`;
+      const budgetRef = doc(db, "budgets", budgetDocId);
       const budgetSnap = await getDoc(budgetRef);
       const budgetLimit = budgetSnap.exists() ? budgetSnap.data().amount : null;
-      
+
       const firstDayOfMonth = new Date(
         new Date().getFullYear(),
         new Date().getMonth(),
@@ -75,10 +76,8 @@ export default function ExpenseForm() {
         userId: user.uid,
       });
 
+    
       toast.success("✅ Expense added!");
-      console.log("Budget Limit:", budgetLimit);
-      console.log("New Total:", newTotal);
-
       if (budgetLimit && newTotal > budgetLimit) {
         setTimeout(() => {
           toast.warning("⚠️ You have exceeded your budget for this category!");
