@@ -76,6 +76,8 @@ export default function ExpenseForm() {
       });
 
       toast.success("✅ Expense added!");
+      console.log("Budget Limit:", budgetLimit);
+      console.log("New Total:", newTotal);
 
       if (budgetLimit && newTotal > budgetLimit) {
         setTimeout(() => {
